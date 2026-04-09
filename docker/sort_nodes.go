@@ -3,7 +3,7 @@ package docker
 import (
 	"sort"
 
-	"github.com/docker/docker/api/types/swarm"
+	"github.com/moby/moby/api/types/swarm"
 )
 
 // Allowed sort methods
@@ -65,5 +65,4 @@ func SortNodes(nodes []swarm.Node, mode SortMode) {
 	case SortByNodeStatus:
 		sort.Sort(nodesByStatus{nodes})
 	}
-
 }

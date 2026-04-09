@@ -7,16 +7,15 @@ import (
 	"io"
 	"strings"
 
-	"github.com/docker/docker/api/types"
-	"github.com/docker/docker/api/types/container"
-	"github.com/docker/docker/client"
 	jsoniter "github.com/json-iterator/go"
+	"github.com/moby/moby/api/types/container"
+	"github.com/moby/moby/client"
 )
 
 // StatsChannel manages the stats channel of a container
 type StatsChannel struct {
 	Container *Container
-	version   *types.Version
+	version   *client.ServerVersionResult
 	client    client.ContainerAPIClient
 }
 
@@ -26,11 +25,13 @@ func (s *StatsChannel) Start(ctx context.Context) <-chan *Stats {
 
 	go func() {
 		defer close(stats)
-		containerStats, err := s.client.ContainerStats(ctx, s.Container.Names[0], true)
-
+		containerStats, err := s.client.ContainerStats(ctx, s.Container.Names[0], client.ContainerStatsOptions{
+			Stream: true,
+		})
 		if err != nil {
 			nonBlockingSend(stats, &Stats{
-				Error: fmt.Errorf("create stats stream for container %s: %w", s.Container.ID, err)})
+				Error: fmt.Errorf("create stats stream for container %s: %w", s.Container.ID, err),
+			})
 			return
 		}
 
@@ -46,19 +47,21 @@ func (s *StatsChannel) Start(ctx context.Context) <-chan *Stats {
 				if err := dec.Decode(&statsJSON); err != nil {
 					if err == io.EOF {
 						nonBlockingSend(stats, &Stats{
-							Error: fmt.Errorf("end of stats stream reached for container %s", s.Container.ID)})
+							Error: fmt.Errorf("end of stats stream reached for container %s", s.Container.ID),
+						})
 					} else {
 						nonBlockingSend(stats, &Stats{
-							Error: fmt.Errorf("read stats for container %s: %w", s.Container.ID, err)})
+							Error: fmt.Errorf("read stats for container %s: %w", s.Container.ID, err),
+						})
 					}
 					break loop
 				}
 
-				top, err := s.client.ContainerTop(ctx, s.Container.ID, nil)
-
+				top, err := s.client.ContainerTop(ctx, s.Container.ID, client.ContainerTopOptions{})
 				if err != nil {
 					nonBlockingSend(stats, &Stats{
-						Error: fmt.Errorf("retrieve top info for container %s: %w", s.Container.ID, err)})
+						Error: fmt.Errorf("retrieve top info for container %s: %w", s.Container.ID, err),
+					})
 					break loop
 				}
 				nonBlockingSend(stats, buildStats(s.version, s.Container, &statsJSON, &top))
@@ -66,13 +69,12 @@ func (s *StatsChannel) Start(ctx context.Context) <-chan *Stats {
 				break loop
 			}
 		}
-
 	}()
 	return stats
 }
 
 // newStatsChannel creates a ready to use stats channel
-func newStatsChannel(version *types.Version, client client.ContainerAPIClient, container *Container) (*StatsChannel, error) {
+func newStatsChannel(version *client.ServerVersionResult, client client.ContainerAPIClient, container *Container) (*StatsChannel, error) {
 	if container == nil {
 		return nil, errors.New("Container cannot be null")
 	} else if !IsContainerRunning(container) {
@@ -83,11 +85,10 @@ func newStatsChannel(version *types.Version, client client.ContainerAPIClient, c
 		Container: container,
 		version:   version,
 	}, nil
-
 }
 
 // buildStats builds Stats with the given information
-func buildStats(version *types.Version, container *Container, stats *container.StatsResponse, topResult *container.TopResponse) *Stats {
+func buildStats(version *client.ServerVersionResult, container *Container, stats *container.StatsResponse, topResult *client.ContainerTopResult) *Stats {
 	s := &Stats{
 		CID:         TruncateID(container.ID),
 		Command:     container.Command,
@@ -148,7 +149,6 @@ func calculateNetwork(stats *container.StatsResponse) (float64, float64) {
 		tx += float64(v.TxBytes)
 	}
 	return rx, tx
-
 }
 
 func calculateMemUsageUnixNoCache(mem container.MemoryStats) float64 {

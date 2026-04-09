@@ -3,7 +3,7 @@ package docker
 import (
 	"testing"
 
-	"github.com/docker/docker/api/types/swarm"
+	"github.com/moby/moby/api/types/swarm"
 )
 
 func TestSortNodes(t *testing.T) {
@@ -129,7 +129,7 @@ func TestSortNodes(t *testing.T) {
 			if nodes[0].Description.Hostname != "a" {
 				t.Errorf("Unexpected node as first element %v", nodes[0])
 			}
-			//Hostname is used to check ordering for any testcase
+			// Hostname is used to check ordering for any testcase
 			if nodes[0].Description.Hostname > nodes[1].Description.Hostname {
 				t.Errorf("Unexpected node ordering %v", nodes)
 			}

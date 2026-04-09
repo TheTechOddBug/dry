@@ -4,7 +4,7 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/docker/docker/api/types/swarm"
+	"github.com/moby/moby/api/types/swarm"
 )
 
 func TestSortServices(t *testing.T) {
@@ -91,7 +91,6 @@ func TestSortServices(t *testing.T) {
 }
 
 func toSortInterface(services []swarm.Service, mode SortMode) sort.Interface {
-
 	switch mode {
 	case SortByServiceName:
 		return servicesByName{services}
@@ -100,5 +99,4 @@ func toSortInterface(services []swarm.Service, mode SortMode) sort.Interface {
 	default:
 		return nil
 	}
-
 }

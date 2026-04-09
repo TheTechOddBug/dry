@@ -3,11 +3,11 @@ package docker
 import (
 	"sync"
 
-	"github.com/docker/docker/api/types/events"
+	"github.com/moby/moby/api/types/events"
 )
 
 const (
-	//DefaultCapacity of a new EventLog.
+	// DefaultCapacity of a new EventLog.
 	DefaultCapacity = 50
 )
 

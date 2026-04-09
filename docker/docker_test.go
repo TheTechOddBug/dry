@@ -4,8 +4,8 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/docker/docker/api/types/container"
-	dockerAPI "github.com/docker/docker/client"
+	"github.com/moby/moby/api/types/container"
+	"github.com/moby/moby/client"
 	"github.com/moncho/dry/docker/mock"
 )
 
@@ -38,6 +38,7 @@ func TestContainerConversionToPointerList(t *testing.T) {
 		}
 	}
 }
-func createClient() dockerAPI.ContainerAPIClient {
+
+func createClient() client.ContainerAPIClient {
 	return mock.ContainerAPIClientMock{}
 }

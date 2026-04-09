@@ -3,7 +3,7 @@ package formatter
 import (
 	"testing"
 
-	"github.com/docker/docker/api/types/image"
+	"github.com/moby/moby/api/types/image"
 )
 
 func TestImageNameFormatting(t *testing.T) {
@@ -22,6 +22,7 @@ func TestImageNameFormatting(t *testing.T) {
 		t.Errorf("Tag value not what expected after formatting: %s", tag)
 	}
 }
+
 func TestImageNameFormattingPrivateRegistry(t *testing.T) {
 	formatter := ImageFormatter{
 		trunc: false,

@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/distribution/reference"
-	"github.com/docker/docker/api/types/swarm"
 	"github.com/docker/go-units"
+	"github.com/moby/moby/api/types/swarm"
 	"github.com/moncho/dry/docker"
 )
 
@@ -37,7 +37,6 @@ func (t *TaskStringer) ID() string {
 
 // Name Task name as a string
 func (t *TaskStringer) Name() string {
-
 	if serviceName, err := t.api.ResolveService(t.task.ServiceID); err == nil {
 		name := ""
 		if t.task.Slot != 0 {
@@ -48,7 +47,6 @@ func (t *TaskStringer) Name() string {
 		return name
 	}
 	return ""
-
 }
 
 // Image Task image as a string

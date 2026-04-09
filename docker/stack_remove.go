@@ -7,9 +7,10 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/docker/docker/api/types/network"
-	"github.com/docker/docker/api/types/swarm"
-	"github.com/docker/docker/api/types/versions"
+	"github.com/moby/moby/api/types/network"
+	"github.com/moby/moby/api/types/swarm"
+	"github.com/moby/moby/client"
+	"github.com/moby/moby/client/pkg/versions"
 )
 
 // StackRemove removes the stack with the given in
@@ -74,11 +75,12 @@ func sortServiceByName(services []swarm.Service) func(i, j int) bool {
 func removeServices(
 	ctx context.Context,
 	daemon *DockerDaemon,
-	services []swarm.Service) bool {
+	services []swarm.Service,
+) bool {
 	var hasError bool
 	sort.Slice(services, sortServiceByName(services))
 	for _, service := range services {
-		if err := daemon.client.ServiceRemove(ctx, service.ID); err != nil {
+		if _, err := daemon.client.ServiceRemove(ctx, service.ID, client.ServiceRemoveOptions{}); err != nil {
 			hasError = true
 		}
 	}
@@ -88,10 +90,11 @@ func removeServices(
 func removeNetworks(
 	ctx context.Context,
 	daemon *DockerDaemon,
-	networks []network.Inspect) bool {
+	networks []network.Inspect,
+) bool {
 	var hasError bool
-	for _, network := range networks {
-		if err := daemon.client.NetworkRemove(ctx, network.ID); err != nil {
+	for _, nw := range networks {
+		if _, err := daemon.client.NetworkRemove(ctx, nw.ID, client.NetworkRemoveOptions{}); err != nil {
 			hasError = true
 		}
 	}
@@ -101,10 +104,11 @@ func removeNetworks(
 func removeSecrets(
 	ctx context.Context,
 	daemon *DockerDaemon,
-	secrets []swarm.Secret) bool {
+	secrets []swarm.Secret,
+) bool {
 	var hasError bool
 	for _, secret := range secrets {
-		if err := daemon.client.SecretRemove(ctx, secret.ID); err != nil {
+		if _, err := daemon.client.SecretRemove(ctx, secret.ID, client.SecretRemoveOptions{}); err != nil {
 			hasError = true
 		}
 	}
@@ -114,10 +118,11 @@ func removeSecrets(
 func removeConfigs(
 	ctx context.Context,
 	daemon *DockerDaemon,
-	configs []swarm.Config) bool {
+	configs []swarm.Config,
+) bool {
 	var hasError bool
 	for _, config := range configs {
-		if err := daemon.client.ConfigRemove(ctx, config.ID); err != nil {
+		if _, err := daemon.client.ConfigRemove(ctx, config.ID, client.ConfigRemoveOptions{}); err != nil {
 			hasError = true
 		}
 	}

@@ -18,9 +18,9 @@ import (
 	"charm.land/lipgloss/v2"
 	"github.com/NimbleMarkets/ntcharts/v2/canvas/runes"
 	timeserieslinechart "github.com/NimbleMarkets/ntcharts/v2/linechart/timeserieslinechart"
-	"github.com/docker/docker/api/types/events"
-	"github.com/docker/docker/pkg/stdcopy"
 	"github.com/docker/go-units"
+	"github.com/moby/moby/api/pkg/stdcopy"
+	"github.com/moby/moby/api/types/events"
 	"github.com/moncho/dry/appui"
 	appcompose "github.com/moncho/dry/appui/compose"
 	appswarm "github.com/moncho/dry/appui/swarm"
@@ -231,8 +231,8 @@ func loadContainerLogStreamWithTail(daemon docker.ContainerDaemon, id string, ta
 		return streamingContent{}, errors.New("log stream unavailable")
 	}
 	return streamingContent{
-		title:   fmt.Sprintf("Logs: %s", shortID(id)),
-		reader:  demuxDockerStream(reader),
+		title:  fmt.Sprintf("Logs: %s", shortID(id)),
+		reader: demuxDockerStream(reader),
 	}, nil
 }
 
@@ -286,8 +286,8 @@ func loadComposeLogStreamWithTail(daemon docker.ContainerDaemon, project, servic
 		title = fmt.Sprintf("Logs: %s/%s", project, service)
 	}
 	return streamingContent{
-		title:   title,
-		reader:  mergeLogReaders(named),
+		title:  title,
+		reader: mergeLogReaders(named),
 	}, nil
 }
 

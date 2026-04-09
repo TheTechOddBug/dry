@@ -4,13 +4,15 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/docker/docker/api/types/container"
+	"github.com/moby/moby/api/types/container"
 	"github.com/moncho/dry/docker/mock"
 )
 
-var testContainers = createTestContainers(10)
-var containerCount = len(testContainers)
-var hundredContainers = createTestContainers(100)
+var (
+	testContainers    = createTestContainers(10)
+	containerCount    = len(testContainers)
+	hundredContainers = createTestContainers(100)
+)
 
 func BenchmarkMemoryStoreContainerCreation(b *testing.B) {
 	c := mock.ContainerAPIClientMock{Containers: hundredContainers}

@@ -3,7 +3,7 @@ package docker
 import (
 	"context"
 
-	"github.com/docker/docker/api/types/events"
+	"github.com/moby/moby/api/types/events"
 )
 
 // EventCallback defines a callback function for messages
@@ -31,8 +31,8 @@ func logEvents(log *EventLog) EventCallback {
 func handleEvent(
 	ctx context.Context,
 	event events.Message,
-	processors ...EventCallback) {
-
+	processors ...EventCallback,
+) {
 	for _, ep := range processors {
 		ep(ctx, event)
 	}
